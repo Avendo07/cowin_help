@@ -1,3 +1,6 @@
+import 'package:cowin_help/models/session.dart';
+import 'package:cowin_help/ui_elements/capacity_display.dart';
+import 'package:cowin_help/ui_elements/dateList.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -6,9 +9,10 @@ class CenterDetailsTile extends StatefulWidget {
   final String address;
   final int slots;
   final int minAgeLimit;
+  final List<Session> sessions;
 
   const CenterDetailsTile(
-      {Key key, @required this.name, @required this.address, @required this.slots, @required this.minAgeLimit})
+      {Key key, @required this.name, @required this.address, @required this.slots, @required this.minAgeLimit, @required this.sessions})
       : super(key: key);
 
   @override
@@ -21,7 +25,7 @@ class _CenterDetailsTileState extends State<CenterDetailsTile> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: widget.minAgeLimit>18?Colors.cyan.shade100: Colors.deepOrangeAccent.shade100,
+      color: widget.minAgeLimit>18?Colors.deepOrangeAccent.shade100: Colors.cyan.shade100,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       child: ExpansionTile(
         childrenPadding: EdgeInsets.all(15.0),
@@ -33,20 +37,13 @@ class _CenterDetailsTileState extends State<CenterDetailsTile> {
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircleAvatar(
-              maxRadius: 20,
-              minRadius: 1,
-              backgroundColor: Colors.yellow,
-              child: Text(
-                (widget.slots ?? (0)).toString(),
-                style: TextStyle(fontSize: 15.0),
-              ),
-            ),
+            CapacityDisplay(cap: widget.slots,),
             expanded
                 ? Icon(Icons.keyboard_arrow_up)
                 : Icon(Icons.keyboard_arrow_down)
           ],
         ),
+        children: DateList.createSessionList(widget.sessions),
         onExpansionChanged: (e) {
           if (e) {
             setState(() {
