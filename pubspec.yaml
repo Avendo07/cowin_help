@@ -26,6 +26,7 @@ dependencies:
   http:
   provider:
   stacked:
+  intl:
 
 
   # The following adds the Cupertino Icons font to your application.

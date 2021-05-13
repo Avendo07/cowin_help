@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cowin_help/view_models/center_list_view_model.dart';
 import 'package:cowin_help/view_models/home_view_model.dart';
 import 'package:cowin_help/models/center.dart' as c;
 import 'package:cowin_help/repository/api_calls.dart';
@@ -9,6 +10,8 @@ import 'package:stacked/stacked.dart';
 
 import 'package:http/http.dart';
 
+import '../enums.dart';
+
 class Home extends StatefulWidget {
   static final routeName = '/home';
 
@@ -18,54 +21,113 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   bool expandedArrow = false;
+  DataSource _source = DataSource.pin;
+  TextEditingController tc = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     print("Built");
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: ViewModelBuilder<HomeViewModel>.nonReactive(
         viewModelBuilder: () => HomeViewModel(),
-        onModelReady: (model) => model.retrieveList(),
-        builder: (context, model, child) {
-          print(model.centers);
-          if (model.isBusy) {
-            return Center(child: CircularProgressIndicator());
-          }
-          return Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 30.0, horizontal: 5.0),
-              child: ListView.builder(
-                itemBuilder: (context, i) => CenterDetailsTile(
-                  address: model.centers[i].address,
-                  name: model.centers[i].name,
-                  slots: model.findTotalSlots(model.centers[i].sessions),
-                  minAgeLimit: model.findMinAge(model.centers[i].sessions),
+        onModelReady: (model)=> model.setInitialised(false) ,
+        builder: (context, homeModel, child) {
+          return Column(
+            children: [
+              Flexible(
+                flex: 3,
+                fit: FlexFit.loose,
+                child: Container(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              Radio(
+                                value: DataSource.pin,
+                                groupValue: _source,
+                                onChanged: (data) {
+                                  setState(() {
+                                    _source = data;
+                                  });
+                                },
+                              ),
+                              Text("Pin Code")
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Radio(
+                                value: DataSource.district,
+                                groupValue: _source,
+                                onChanged: (data) {
+                                  setState(() {
+                                    _source = data;
+                                  });
+                                },
+                              ),
+                              Text("State And District")
+                            ],
+                          )
+                        ],
+                      ),
+                      (_source == DataSource.pin)
+                          ? Row(
+                            children: [
+                              Flexible(
+                                flex: 9,
+                                child: TextField(
+                                    maxLength: 6,
+                                    maxLines: 1,
+                                    controller: tc,
+                                    keyboardType: TextInputType.numberWithOptions(
+                                        signed: false, decimal: false),
+                                  ),
+                              ),
+                              RaisedButton(onPressed: (){
+                                print("Current Date" + DateTime.now().toString());
+                                homeModel.retrieveList(DateTime.now(), int.parse(tc.value.text));
+                              }, child: Text("Search"),)
+                            ],
+                          )
+                          : FlutterLogo()
+                    ],
+                  ),
                 ),
-                itemCount: model.centers.length,
-              ));
+              ),
+              Flexible(
+                flex: 14,
+                fit: FlexFit.loose,
+                child: ViewModelBuilder<CenterListViewModel>.nonReactive(
+                  viewModelBuilder: () => CenterListViewModel(),
+                  builder: (context, listModel, child) {
+                    print(homeModel.centers);
+                    if(!homeModel.initialised)
+                      return Center(child: Text("Enter the details to fetch data"),heightFactor: 40,);
+                    if (homeModel.isBusy) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    return ListView.builder(
+                      itemBuilder: (context, i) => CenterDetailsTile(
+                        address: homeModel.centers[i].address,
+                        name: homeModel.centers[i].name,
+                        slots: listModel.findTotalSlots(homeModel.centers[i].sessions),
+                        minAgeLimit:
+                            listModel.findMinAge(homeModel.centers[i].sessions),
+                      ),
+                      itemCount: homeModel.centers.length,
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
         },
       ),
     );
     /**/
   }
 }
-
-/*CircleAvatar(
-maxRadius: 15,
-backgroundColor: Colors.yellow,
-child: Text("No", style: TextStyle(fontSize: 15.0),),
-),*/
-
-/*RaisedButton(onPressed: () async {
-              Response r = await sevenDaySchedule("13-05-2021", 110084);
-              print(r.statusCode);
-              if(r.statusCode == 200){
-                print(r.body);
-                Map<String, dynamic> m = jsonDecode(r.body);
-                List<c.Center> list = (m["centers"] as List).map((center) => c.Center.fromJson(center)).toList();
-                print("Address" + list[0].sessions[0].availableCapacity.toString());
-                print("\n" + r.headers.toString());
-              }else{
-                print(r.headers);
-              }
-            })*/
