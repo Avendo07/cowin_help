@@ -22,18 +22,29 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     print("Built");
-    return ViewModelBuilder<HomeViewModel>.nonReactive(
-      viewModelBuilder: () => HomeViewModel(),
-      onModelReady: (model) => model.retrieveList(),
-      builder: (context, model, child) {
-        return Scaffold(
-          body: Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 30.0, horizontal: 5.0),
-            child: CenterDetailsTile(name: model.centers[0].name, address: model.centers[0].address,)
-          ),
-        );
-      },
+    return Scaffold(
+      body: ViewModelBuilder<HomeViewModel>.nonReactive(
+        viewModelBuilder: () => HomeViewModel(),
+        onModelReady: (model) => model.retrieveList(),
+        builder: (context, model, child) {
+          print(model.centers);
+          if (model.isBusy) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 30.0, horizontal: 5.0),
+              child: ListView.builder(
+                itemBuilder: (context, i) => CenterDetailsTile(
+                  address: model.centers[i].address,
+                  name: model.centers[i].name,
+                  slots: model.findTotalSlots(model.centers[i].sessions),
+                  minAgeLimit: model.findMinAge(model.centers[i].sessions),
+                ),
+                itemCount: model.centers.length,
+              ));
+        },
+      ),
     );
     /**/
   }
@@ -44,7 +55,6 @@ maxRadius: 15,
 backgroundColor: Colors.yellow,
 child: Text("No", style: TextStyle(fontSize: 15.0),),
 ),*/
-
 
 /*RaisedButton(onPressed: () async {
               Response r = await sevenDaySchedule("13-05-2021", 110084);
