@@ -7,7 +7,6 @@ import 'package:stacked/stacked.dart';
 import 'package:http/http.dart';
 
 class HomeViewModel extends BaseViewModel {
-
   List<c.Center> _centers;
   List<c.Center> get centers => _centers;
 

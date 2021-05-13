@@ -1,14 +1,9 @@
-import 'dart:convert';
 import 'package:cowin_help/view_models/center_list_view_model.dart';
 import 'package:cowin_help/view_models/home_view_model.dart';
-import 'package:cowin_help/models/center.dart' as c;
-import 'package:cowin_help/repository/api_calls.dart';
 import 'package:cowin_help/ui_elements/list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:stacked/stacked.dart';
-
-import 'package:http/http.dart';
 
 import '../enums.dart';
 
@@ -31,7 +26,7 @@ class _HomeState extends State<Home> {
       resizeToAvoidBottomInset: false,
       body: ViewModelBuilder<HomeViewModel>.nonReactive(
         viewModelBuilder: () => HomeViewModel(),
-        onModelReady: (model)=> model.setInitialised(false) ,
+        onModelReady: (model) => model.setInitialised(false),
         builder: (context, homeModel, child) {
           return Column(
             children: [
@@ -44,55 +39,99 @@ class _HomeState extends State<Home> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(
-                            children: [
-                              Radio(
-                                value: DataSource.pin,
-                                groupValue: _source,
-                                onChanged: (data) {
-                                  setState(() {
-                                    _source = data;
-                                  });
-                                },
-                              ),
-                              Text("Pin Code")
-                            ],
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _source = DataSource.pin;
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                Radio(
+                                  value: DataSource.pin,
+                                  groupValue: _source,
+                                  onChanged: (data) {
+                                    setState(() {
+                                      _source = data;
+                                    });
+                                  },
+                                ),
+                                Text("Pin Code")
+                              ],
+                            ),
                           ),
-                          Row(
-                            children: [
-                              Radio(
-                                value: DataSource.district,
-                                groupValue: _source,
-                                onChanged: (data) {
-                                  setState(() {
-                                    _source = data;
-                                  });
-                                },
-                              ),
-                              Text("State And District")
-                            ],
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                _source = DataSource.district;
+                              });
+                            },
+                            child: Row(
+                              children: [
+                                Radio(
+                                  value: DataSource.district,
+                                  groupValue: _source,
+                                  onChanged: (data) {
+                                    setState(() {
+                                      _source = data;
+                                    });
+                                  },
+                                ),
+                                Text("State And District")
+                              ],
+                            ),
                           )
                         ],
                       ),
                       (_source == DataSource.pin)
-                          ? Row(
-                            children: [
-                              Flexible(
-                                flex: 9,
-                                child: TextField(
-                                    maxLength: 6,
-                                    maxLines: 1,
-                                    controller: tc,
-                                    keyboardType: TextInputType.numberWithOptions(
-                                        signed: false, decimal: false),
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    fit: FlexFit.loose,
+                                    flex: 14,
+                                    child: TextField(
+                                      decoration: InputDecoration(
+                                          hintText: "Enter the Pin Code",
+                                          alignLabelWithHint: true),
+                                      maxLength: 6,
+                                      maxLines: 1,
+                                      controller: tc,
+                                      onSubmitted: (value) {
+                                        print("Current Date" +
+                                            DateTime.now().toString());
+                                        homeModel.retrieveList(DateTime.now(),
+                                            int.parse(value));
+                                      },
+                                      keyboardType:
+                                          TextInputType.numberWithOptions(
+                                        signed: false,
+                                        decimal: false,
+                                      ),
+                                    ),
                                   ),
+                                  Flexible(
+                                    child: Container(),
+                                    flex: 1,
+                                  ),
+                                  Flexible(
+                                    fit: FlexFit.loose,
+                                    flex: 4,
+                                    child: RaisedButton(
+                                      onPressed: () {
+                                        print("Current Date" +
+                                            DateTime.now().toString());
+                                        homeModel.retrieveList(DateTime.now(),
+                                            int.parse(tc.value.text));
+                                      },
+                                      child: Text("Search"),
+                                    ),
+                                  )
+                                ],
                               ),
-                              RaisedButton(onPressed: (){
-                                print("Current Date" + DateTime.now().toString());
-                                homeModel.retrieveList(DateTime.now(), int.parse(tc.value.text));
-                              }, child: Text("Search"),)
-                            ],
-                          )
+                            )
                           : FlutterLogo()
                     ],
                   ),
@@ -105,8 +144,11 @@ class _HomeState extends State<Home> {
                   viewModelBuilder: () => CenterListViewModel(),
                   builder: (context, listModel, child) {
                     print(homeModel.centers);
-                    if(!homeModel.initialised)
-                      return Center(child: Text("Enter the details to fetch data"),heightFactor: 40,);
+                    if (!homeModel.initialised)
+                      return Center(
+                        child: Text("Enter the details to fetch data"),
+                        heightFactor: 40,
+                      );
                     if (homeModel.isBusy) {
                       return Center(child: CircularProgressIndicator());
                     }
@@ -114,9 +156,11 @@ class _HomeState extends State<Home> {
                       itemBuilder: (context, i) => CenterDetailsTile(
                         address: homeModel.centers[i].address,
                         name: homeModel.centers[i].name,
-                        slots: listModel.findTotalSlots(homeModel.centers[i].sessions),
+                        slots: listModel
+                            .findTotalSlots(homeModel.centers[i].sessions),
                         minAgeLimit:
                             listModel.findMinAge(homeModel.centers[i].sessions),
+                        sessions: homeModel.centers[i].sessions,
                       ),
                       itemCount: homeModel.centers.length,
                     );
