@@ -105,7 +105,7 @@ class _HomeState extends State<Home> {
                                       onSubmitted: (value) {
                                         print("Current Date" +
                                             DateTime.now().toString());
-                                        homeModel.retrieveListPin(
+                                        homeModel.retrieveList(
                                             DateTime.now(), int.parse(value));
                                       },
                                       keyboardType:
@@ -126,7 +126,7 @@ class _HomeState extends State<Home> {
                                       onPressed: () {
                                         print("Current Date" +
                                             DateTime.now().toString());
-                                        homeModel.retrieveListPin(DateTime.now(),
+                                        homeModel.retrieveList(DateTime.now(),
                                             int.parse(tc.value.text));
                                       },
                                       child: Text("Search"),
