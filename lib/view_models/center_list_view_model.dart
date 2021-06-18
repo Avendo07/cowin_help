@@ -1,9 +1,5 @@
-import 'dart:convert';
-import 'package:cowin_help/models/center.dart' as c;
 import 'package:cowin_help/models/session.dart';
-import 'package:cowin_help/repository/api_calls.dart';
 import 'package:stacked/stacked.dart';
-import 'package:http/http.dart';
 
 class CenterListViewModel extends BaseViewModel {
 

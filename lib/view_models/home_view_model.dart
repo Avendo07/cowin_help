@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:cowin_help/models/center.dart' as c;
-import 'package:cowin_help/models/session.dart';
+import '../models/session.dart';
 import 'package:cowin_help/repository/api_calls.dart';
 import 'package:cowin_help/utilities/date_time.dart';
 import 'package:stacked/stacked.dart';
