@@ -106,7 +106,7 @@ class _HomeState extends State<Home> {
                                         print("Current Date" +
                                             DateTime.now().toString());
                                         homeModel.retrieveList(
-                                            DateTime.now(), int.parse(value));
+                                            DateTime.now(), pinCode: int.parse(value));
                                       },
                                       keyboardType:
                                           TextInputType.numberWithOptions(
@@ -127,7 +127,7 @@ class _HomeState extends State<Home> {
                                         print("Current Date" +
                                             DateTime.now().toString());
                                         homeModel.retrieveList(DateTime.now(),
-                                            int.parse(tc.value.text));
+                                            pinCode: int.parse(tc.value.text));
                                       },
                                       child: Text("Search"),
                                     ),
@@ -155,7 +155,10 @@ class _HomeState extends State<Home> {
                                         value: homeModel.selectedDistrict,
                                       ),
                                 RaisedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    homeModel.retrieveList(
+                                        DateTime.now(), districtId: homeModel.selectedDistrict);
+                                  },
                                   child: Text("Search"),
                                 )
                               ],

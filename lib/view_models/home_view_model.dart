@@ -24,14 +24,19 @@ class HomeViewModel extends BaseViewModel {
   int selectedState=0;
   int selectedDistrict=0;
 
-  Future<List<c.Center>> retrieveList(DateTime date, int pinCode) async {
+  Future<List<c.Center>> retrieveList(DateTime date, {int pinCode, int districtId}) async {
     setInitialised(true);
     setBusy(true);
 
     String _date = DateTimeUtility.formatDate(date);
 
     List<c.Center> centers;
-    Response r = await sevenDaySchedule(_date, pinCode);
+    Response r;
+    if(pinCode!=null)
+      r = await sevenDaySchedulePin(_date, pinCode);
+    else
+      r = await sevenDayScheduleDistrict(_date, districtId);
+    print("Sel dis " + selectedDistrict.toString());
     print(r.statusCode);
     if (r.statusCode == 200) {
       print(r.body);
