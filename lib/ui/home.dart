@@ -1,8 +1,8 @@
+import 'package:cowin_help/ui_elements/list_tile.dart';
 import 'package:cowin_help/view_models/center_list_view_model.dart';
 import 'package:cowin_help/view_models/home_view_model.dart';
-import 'package:cowin_help/ui_elements/list_tile.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 import '../enums.dart';
@@ -24,14 +24,17 @@ class _HomeState extends State<Home> {
     print("Built");
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: ViewModelBuilder<HomeViewModel>.nonReactive(
+      body: ViewModelBuilder<HomeViewModel>.reactive(
         viewModelBuilder: () => HomeViewModel(),
-        onModelReady: (model) => model.setInitialised(false),
+        onModelReady: (model) {
+          model.setInitialised(false);
+          model.retrieveStates();
+        },
         builder: (context, homeModel, child) {
           return Column(
             children: [
               Flexible(
-                flex: 3,
+                flex: (_source == DataSource.pin)?3:6,
                 fit: FlexFit.loose,
                 child: Container(
                   child: Column(
@@ -102,8 +105,8 @@ class _HomeState extends State<Home> {
                                       onSubmitted: (value) {
                                         print("Current Date" +
                                             DateTime.now().toString());
-                                        homeModel.retrieveList(DateTime.now(),
-                                            int.parse(value));
+                                        homeModel.retrieveListPin(
+                                            DateTime.now(), int.parse(value));
                                       },
                                       keyboardType:
                                           TextInputType.numberWithOptions(
@@ -123,7 +126,7 @@ class _HomeState extends State<Home> {
                                       onPressed: () {
                                         print("Current Date" +
                                             DateTime.now().toString());
-                                        homeModel.retrieveList(DateTime.now(),
+                                        homeModel.retrieveListPin(DateTime.now(),
                                             int.parse(tc.value.text));
                                       },
                                       child: Text("Search"),
@@ -132,7 +135,31 @@ class _HomeState extends State<Home> {
                                 ],
                               ),
                             )
-                          : FlutterLogo()
+                          : Column(
+                              children: [
+                                homeModel.isBusy
+                                    ? CircularProgressIndicator()
+                                    : DropdownButton(
+                                        items: homeModel
+                                            .dropDownStates(homeModel.states),
+                                        onChanged: homeModel.changeValueStates,
+                                        value: homeModel.selectedState,
+                                      ),
+                                homeModel.isBusy
+                                    ? CircularProgressIndicator()
+                                    : DropdownButton(
+                                        items: homeModel.dropDownDistricts(
+                                            homeModel.districts),
+                                        onChanged:
+                                            homeModel.changeValueDistricts,
+                                        value: homeModel.selectedDistrict,
+                                      ),
+                                RaisedButton(
+                                  onPressed: () {},
+                                  child: Text("Search"),
+                                )
+                              ],
+                            ),
                     ],
                   ),
                 ),
