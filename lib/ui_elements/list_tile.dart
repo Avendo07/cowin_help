@@ -3,6 +3,7 @@ import 'package:cowin_help/ui_elements/capacity_display.dart';
 import 'package:cowin_help/ui_elements/dateList.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class CenterDetailsTile extends StatefulWidget {
   final String name;
@@ -38,9 +39,18 @@ class _CenterDetailsTileState extends State<CenterDetailsTile> {
           mainAxisSize: MainAxisSize.min,
           children: [
             CapacityDisplay(cap: widget.slots,),
-            expanded
-                ? Icon(Icons.keyboard_arrow_up)
-                : Icon(Icons.keyboard_arrow_down)
+            SizedBox(width: 2.0,),
+            Material(
+                shape: CircleBorder(),
+                elevation: 3.0,
+                child: IconButton(
+                  icon: Icon(Icons.map_outlined),
+                  onPressed: () {
+                    print("Hello");
+                    launch(
+                        "https://www.google.com/maps/dir/?api=1&destination=${(widget.name + " " + widget.address).replaceAll(" ", "+")}&travelmode=driving");
+                  },
+                ))
           ],
         ),
         children: DateList.createSessionList(widget.sessions),

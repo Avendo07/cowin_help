@@ -27,6 +27,7 @@ dependencies:
   provider:
   stacked:
   intl:
+  url_launcher:
 
 
   # The following adds the Cupertino Icons font to your application.
