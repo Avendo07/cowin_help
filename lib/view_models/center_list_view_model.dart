@@ -1,4 +1,4 @@
-import 'package:cowin_help/models/session.dart';
+import 'package:cowin_help/models/pin/session.dart';
 import 'package:stacked/stacked.dart';
 
 class CenterListViewModel extends BaseViewModel {

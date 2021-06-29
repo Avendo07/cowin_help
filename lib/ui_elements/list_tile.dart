@@ -1,4 +1,4 @@
-import 'package:cowin_help/models/session.dart';
+import 'package:cowin_help/models/pin/session.dart';
 import 'package:cowin_help/ui_elements/capacity_display.dart';
 import 'package:cowin_help/ui_elements/dateList.dart';
 import 'package:flutter/cupertino.dart';

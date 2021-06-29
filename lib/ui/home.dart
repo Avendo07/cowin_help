@@ -34,7 +34,7 @@ class _HomeState extends State<Home> {
           return Column(
             children: [
               Flexible(
-                flex: (_source == DataSource.pin)?3:6,
+                flex: (_source == DataSource.pin)?4:6,
                 fit: FlexFit.loose,
                 child: Container(
                   child: Column(
@@ -121,7 +121,7 @@ class _HomeState extends State<Home> {
                                   ),
                                   Flexible(
                                     fit: FlexFit.loose,
-                                    flex: 4,
+                                    flex: 5,
                                     child: RaisedButton(
                                       onPressed: () {
                                         print("Current Date" +

@@ -1,13 +1,13 @@
 import 'dart:convert';
-import 'package:cowin_help/models/center.dart' as c;
+
 import 'package:cowin_help/models/district.dart';
+import 'package:cowin_help/models/pin/center.dart' as c;
 import 'package:cowin_help/models/state.dart' as s;
-import 'package:flutter/material.dart';
-import '../models/session.dart';
 import 'package:cowin_help/repository/api_calls.dart';
 import 'package:cowin_help/utilities/date_time.dart';
-import 'package:stacked/stacked.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:stacked/stacked.dart';
 
 class HomeViewModel extends BaseViewModel {
   List<c.Center> _centers;
@@ -41,10 +41,18 @@ class HomeViewModel extends BaseViewModel {
     if (r.statusCode == 200) {
       print(r.body);
       Map<String, dynamic> m = jsonDecode(r.body);
-      List<c.Center> list = (m["centers"] as List)
-          .map((center) => c.Center.fromJson(center))
-          .toList();
-      //print("Address" + list[0].sessions[0].availableCapacity.toString());
+      List<c.Center> list;
+    if(pinCode!=null){
+        list = (m["centers"] as List)
+            .map((center) => c.Center.fromJson(center))
+            .toList();
+      }else{
+        list = [];
+        List l =List<Map<String,dynamic>>.from(m["sessions"]);
+        List<Map> newList = convertJson(l);
+        print("List new" +newList.toString());
+        list = newList.map((center) => c.Center.fromJson(center)).toList();
+      }
       print("\n" + r.headers.toString());
       centers = list;
       _centers = list;
@@ -138,4 +146,71 @@ class HomeViewModel extends BaseViewModel {
     notifyListeners();
   }
 
+}
+
+List<Map> convertJson(List l) {
+  int current = 1;
+  bool first = true;
+  List<Map> newList = [];
+  List<Map> sessions;
+  for (int i=current; i<l.length ; i++) {
+    Map<String, dynamic> center = Map<String, dynamic>.from(l[i]);
+    if(first){
+      sessions = [
+        {
+          "session_id": center["session_id"],
+          "date": center["date"],
+          "available_capacity": center["available_capacity"],
+          "available_capacity_dose1": center["available_capacity_dose1"],
+          "available_capacity_dose2": center["available_capacity_dose2"],
+          "fee": center["fee"],
+          "min_age_limit": center["min_age_limit"],
+          "vaccine": center["vaccine"],
+          "slots": center["slots"]
+        }
+      ];
+      first = false;
+    }else{
+      if(l[i]["center_id"] == l[current]["center_id"]){
+        sessions.add({
+          "session_id": center["session_id"],
+          "date": center["date"],
+          "available_capacity": center["available_capacity"],
+          "available_capacity_dose1": center["available_capacity_dose1"],
+          "available_capacity_dose2": center["available_capacity_dose2"],
+          "fee": center["fee"],
+          "min_age_limit": center["min_age_limit"],
+          "vaccine": center["vaccine"],
+          "slots": center["slots"]
+        });
+      }else{
+        sessions = [
+          {
+            "session_id": center["session_id"],
+            "date": center["date"],
+            "available_capacity": center["available_capacity"],
+            "available_capacity_dose1": center["available_capacity_dose1"],
+            "available_capacity_dose2": center["available_capacity_dose2"],
+            "fee": center["fee"],
+            "min_age_limit": center["min_age_limit"],
+            "vaccine": center["vaccine"],
+            "slots": center["slots"]
+          }
+        ];
+        center.remove("session_id");
+        center.remove("date");
+        center.remove("available_capacity");
+        center.remove("available_capacity_dose1");
+        center.remove("available_capacity_dose2");
+        center.remove("fee");
+        center.remove("min_age_limit");
+        center.remove("vaccine");
+        center.remove("slots");
+        center.addAll({"sessions": sessions});
+        newList.add(center);                                                    //center added to list as the common are already extracted
+        current=i;                                                              //Currently comparing this
+      }
+    }
+  }
+  return newList;
 }

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cowin_help/models/session.dart';
+import 'package:cowin_help/models/pin/session.dart';
 
 class Center {
   final int centerId;
@@ -37,7 +37,7 @@ class Center {
   });
 
   Center.fromJson(Map<String, dynamic> _decodedJson)
-      : centerId = _decodedJson["centerId"],
+      : centerId = _decodedJson["center_id"],
         name = _decodedJson["name"],
         address = _decodedJson["address"],
         stateName = _decodedJson["state_name"],
@@ -51,7 +51,7 @@ class Center {
         endTime = _decodedJson["to"],
         //vaccineFees = _decodedJson["vaccine_fees"].map((vaccineFees) => VaccineFees.fromJson(vaccineFees)).toList(),
         sessions = (_decodedJson["sessions"] as List)
-            .map((session) => Session.fromJson(session))
+            .map((session) => Session.fromJson(Map<String, dynamic>.from(session)))
             .toList();
 
   Map<String, dynamic> toJson() {
